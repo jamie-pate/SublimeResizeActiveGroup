@@ -1,9 +1,11 @@
 import sublime_plugin
+import time
 from copy import deepcopy
 
 
 class ResizeActiveGroup(sublime_plugin.EventListener):
-
+    def __init__(self):
+        self.col_times  = []
     # based on the active group we calculate the cols/rows array
     def get_big(self, arr, activeGroup):
         return [arr[0], arr[1] if (activeGroup == 1) ^ (arr[1] > 0.5) else 1 - arr[1], arr[2]]
@@ -17,6 +19,7 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
             oldLayout = window.get_layout()
             newLayout = deepcopy(oldLayout)
 
+            print repr(newLayout) + '| ' + repr(activeGroup)
             
             # 2 cells
             if len(oldLayout["cells"]) == 2:
@@ -26,10 +29,6 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
                 # Rows: 2
                 else:
                     newLayout["rows"] = self.get_big(oldLayout["rows"], activeGroup)
-
-            # 3 cells
-            elif len(oldLayout["cells"]) == 3:
-                pass
 
             # 4 cells
             elif len(oldLayout["cells"]) == 4:
@@ -47,6 +46,36 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
                     elif activeGroup == 3:
                         newLayout["cols"] = self.get_big(oldLayout["cols"], activeGroup - 2)
                         newLayout["rows"] = self.get_big(oldLayout["rows"], activeGroup - 2)
+
+
+            # 3 cols/cells? not sure how it works
+            elif len(oldLayout["cells"]) == 3 and len(oldLayout["cols"]) == 4:
+                widths = []
+                for i in xrange(len(oldLayout["cols"])-1):
+                    widths += [oldLayout["cols"][i+1]-oldLayout["cols"][i]]
+                widths = sorted(widths)
+                w2 = [0 for i in xrange(len(widths))]
+
+
+                for i in xrange(len(oldLayout["cols"])-len(self.col_times)-1):
+                    self.col_times += [0];
+
+                self.col_times[activeGroup] = time.time()
+                order = sorted(zip(xrange(len(self.col_times)),self.col_times), key=lambda value:value[1])
+                order = [o[0] for o in order]
+
+                for i in xrange(len(widths)):
+                    print i
+                    w2[order[i]] = widths[i]
+
+                print repr(widths)
+                print repr(w2)
+                print repr(order)
+                left = 0
+                for i in xrange(len(w2)):
+                    left += w2[i]
+                    newLayout["cols"][i+1] = left;
+                print repr(newLayout["cols"])
 
             if oldLayout != newLayout:
                 window.set_layout(newLayout)
