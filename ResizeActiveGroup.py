@@ -19,7 +19,6 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
             oldLayout = window.get_layout()
             newLayout = deepcopy(oldLayout)
 
-            print repr(newLayout) + '| ' + repr(activeGroup)
             
             # 2 cells
             if len(oldLayout["cells"]) == 2:
@@ -50,6 +49,7 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
 
             # 3 cols/cells? not sure how it works
             elif len(oldLayout["cells"]) == 3 and len(oldLayout["cols"]) == 4:
+
                 widths = []
                 for i in xrange(len(oldLayout["cols"])-1):
                     widths += [oldLayout["cols"][i+1]-oldLayout["cols"][i]]
@@ -65,17 +65,13 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
                 order = [o[0] for o in order]
 
                 for i in xrange(len(widths)):
-                    print i
+                    print (i)
                     w2[order[i]] = widths[i]
 
-                print repr(widths)
-                print repr(w2)
-                print repr(order)
                 left = 0
                 for i in xrange(len(w2)):
                     left += w2[i]
                     newLayout["cols"][i+1] = left;
-                print repr(newLayout["cols"])
-
+                    
             if oldLayout != newLayout:
                 window.set_layout(newLayout)
