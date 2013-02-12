@@ -49,7 +49,9 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
 
             # 3 cols/cells? not sure how it works
             elif len(oldLayout["cells"]) == 3 and len(oldLayout["cols"]) == 4:
-
+                import sys
+                if sys.version_info[0] >= 3:
+                    xrange = range
                 widths = []
                 for i in xrange(len(oldLayout["cols"])-1):
                     widths += [oldLayout["cols"][i+1]-oldLayout["cols"][i]]
@@ -65,7 +67,6 @@ class ResizeActiveGroup(sublime_plugin.EventListener):
                 order = [o[0] for o in order]
 
                 for i in xrange(len(widths)):
-                    print (i)
                     w2[order[i]] = widths[i]
 
                 left = 0
